@@ -2,6 +2,7 @@ const express = require("express");
 const authController = require('../controllers/auth.controller');
 const { body } = require("express-validator");
 const validationResult = require("../middlewares/validate.middleware");
+const { authenticateToken } = require("../middlewares/auth.middleware");
 
 const router = express.Router();
 
@@ -27,11 +28,38 @@ const registerValidationRules = [
     .withMessage("Invalid role"),
 ];
 
-// router.post("/user/register",
-//   registerValidationRules,
-//   validationResult,
-//   authController.registerUser
-// );
+const changePasswordValidationRules = [
+  body("currentPassword")
+    .notEmpty()
+    .withMessage("Current password is required"),
+
+  body("newPassword")
+    .isLength({ min: 6, max: 50 })
+    .withMessage("New password must be between 6 and 50 characters")
+    .matches(/^(?=.*[A-Z])(?=.*[!@#$%^&*]).{6,50}$/)
+    .withMessage("New password must include at least 1 uppercase letter and 1 special character"),
+];
+
+const forgotPasswordValidationRules = [
+  body("email")
+    .isEmail()
+    .withMessage("Please provide a valid email address")
+    .normalizeEmail(),
+];
+
+const resetPasswordValidationRules = [
+  body("token")
+    .notEmpty()
+    .withMessage("Reset token is required"),
+
+  body("newPassword")
+    .isLength({ min: 6, max: 50 })
+    .withMessage("New password must be between 6 and 50 characters")
+    .matches(/^(?=.*[A-Z])(?=.*[!@#$%^&*]).{6,50}$/)
+    .withMessage("New password must include at least 1 uppercase letter and 1 special character"),
+];
+
+
 router.post("/register",
   registerValidationRules,
   validationResult,
@@ -41,6 +69,24 @@ router.post("/register",
 router.post("/login", authController.loginUser);
 router.get("/user/logout", authController.logoutUser);
 router.get("/me", authController.me);
+router.put("/change-password",
+  authenticateToken,
+  changePasswordValidationRules,
+  validationResult,
+  authController.changePassword
+);
+
+router.post("/forgot-password",
+  forgotPasswordValidationRules,
+  validationResult,
+  authController.forgotPassword
+);
+
+router.post("/reset-password",
+  resetPasswordValidationRules,
+  validationResult,
+  authController.resetPassword
+);
 
 
 module.exports = router;

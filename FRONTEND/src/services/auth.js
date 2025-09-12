@@ -43,3 +43,11 @@ export const registerApi = async (userData) => {
   });
   return data?.user ?? data;
 };
+
+export const logoutApi = async () => {
+  // backend exposes GET /api/auth/user/logout which clears the cookie
+  await request('/user/logout', {
+    method: 'GET',
+  });
+  return true;
+};

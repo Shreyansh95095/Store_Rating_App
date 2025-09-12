@@ -4,13 +4,14 @@ import Login from "./pages/Login";
 import AdminDashboard from "./pages/AdminDashboard";
 import UserDashboard from "./pages/UserDashboard";
 import OwnerDashboard from "./pages/OwnerDashboard";
+import Profile from "./pages/Profile";
 import { useEffect, useState } from "react";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 
 function useCurrentUser() {
   const [user, setUser] = useState(null);
   useEffect(() => {
-    let isMounted = true; 
+    let isMounted = true;
     fetch('/api/auth/me', { credentials: 'include' })
       .then(async (res) => {
         if (!res.ok) return null;
@@ -29,7 +30,7 @@ function App() {
   return (
     <div>
       <Routes>
-        <Route path="/login" element={<Login />} />
+        <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route
           path="/admin"
@@ -52,6 +53,14 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={["user"]} user={user}>
               <UserDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute allowedRoles={["owner"]} user={user}>
+              <Profile />
             </ProtectedRoute>
           }
         />

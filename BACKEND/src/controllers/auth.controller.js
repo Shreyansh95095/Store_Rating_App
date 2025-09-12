@@ -124,10 +124,195 @@ async function me(req, res) {
   }
 }
 
+// Change password function
+async function changePassword(req, res) {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const userId = req.user.id;
+
+    // Validate input
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: "Current password and new password are required"
+      });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: "New password must be at least 6 characters long"
+      });
+    }
+
+    // Get current user data
+    const [userRows] = await DB.query(
+      "SELECT password FROM users WHERE id = ?",
+      [userId]
+    );
+
+    if (!userRows.length) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
+    }
+
+    // Verify current password
+    const isCurrentPasswordValid = await bcrypt.compare(currentPassword, userRows[0].password);
+    if (!isCurrentPasswordValid) {
+      return res.status(400).json({
+        success: false,
+        message: "Current password is incorrect"
+      });
+    }
+
+    // Hash new password
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update password in database
+    await DB.query(
+      "UPDATE users SET password = ? WHERE id = ?",
+      [hashedNewPassword, userId]
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Password changed successfully"
+    });
+
+  } catch (error) {
+    console.error("Error changing password:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error"
+    });
+  }
+}
+
+// Forgot password function
+async function forgotPassword(req, res) {
+  try {
+    const { email } = req.body;
+
+    // Validate input
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: "Email is required"
+      });
+    }
+
+    // Check if user exists
+    const [userRows] = await DB.query(
+      "SELECT id, email, fullName FROM users WHERE email = ?",
+      [email]
+    );
+
+    if (!userRows.length) {
+      return res.status(404).json({
+        success: false,
+        message: "No account found with this email address"
+      });
+    }
+
+    const user = userRows[0];
+
+    // Generate a simple reset token (in production, use a more secure method)
+    const resetToken = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    const resetTokenExpiry = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes from now
+
+    // Store reset token in database (you might want to create a separate table for this)
+    await DB.query(
+      "UPDATE users SET resetToken = ?, resetTokenExpiry = ? WHERE id = ?",
+      [resetToken, resetTokenExpiry, user.id]
+    );
+
+    // In a real application, you would send an email here
+    // For now, we'll just return the token (remove this in production)
+    console.log(`Password reset token for ${email}: ${resetToken}`);
+
+    res.status(200).json({
+      success: true,
+      message: "Password reset instructions have been sent to your email",
+      // Remove this in production - only for development
+      resetToken: resetToken
+    });
+
+  } catch (error) {
+    console.error("Error in forgot password:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error"
+    });
+  }
+}
+
+// Reset password function
+async function resetPassword(req, res) {
+  try {
+    const { token, newPassword } = req.body;
+
+    // Validate input
+    if (!token || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: "Reset token and new password are required"
+      });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: "New password must be at least 6 characters long"
+      });
+    }
+
+    // Check if token is valid and not expired
+    const [userRows] = await DB.query(
+      "SELECT id FROM users WHERE resetToken = ? AND resetTokenExpiry > NOW()",
+      [token]
+    );
+
+    if (!userRows.length) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid or expired reset token"
+      });
+    }
+
+    const userId = userRows[0].id;
+
+    // Hash new password
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update password and clear reset token
+    await DB.query(
+      "UPDATE users SET password = ?, resetToken = NULL, resetTokenExpiry = NULL WHERE id = ?",
+      [hashedNewPassword, userId]
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Password has been reset successfully"
+    });
+
+  } catch (error) {
+    console.error("Error resetting password:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error"
+    });
+  }
+}
+
 
 module.exports = {
   registerUser,
   loginUser,
   logoutUser,
   me,
+  changePassword,
+  forgotPassword,
+  resetPassword,
 };
