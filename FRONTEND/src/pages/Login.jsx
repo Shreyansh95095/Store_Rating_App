@@ -29,17 +29,17 @@ export default function Login() {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-200 to-indigo-500 p-4">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-teal-50 to-emerald-200 p-4">
       <form
-        className="relative bg-white/30 backdrop-filter backdrop-blur-lg p-8 rounded-3xl shadow-2xl w-96 max-w-sm border border-white border-opacity-20 transform transition-transform duration-500 hover:scale-105"
+        className="relative bg-white/40 backdrop-filter backdrop-blur-lg p-8 rounded-3xl shadow-2xl w-96 max-w-sm border border-white border-opacity-30 transform transition-transform duration-500 hover:scale-105"
         onSubmit={onSubmit}
       >
         <h2 className="text-3xl font-bold mb-6 text-gray-800 text-center">Login</h2>
-        <RoleSelector role={role} onChange={setRole} />
+        <RoleSelector role={role} onChange={setRole} includeAdmin={true} />
         <input
           type="email"
           placeholder="Email"
-          className="w-full px-4 py-2 mb-4 bg-white/70 border border-gray-300 rounded-lg placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-300"
+          className="w-full px-4 py-3 mb-4 bg-white/70 border border-gray-300 rounded-lg placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-colors duration-300"
           value={email}
           onChange={e => setEmail(e.target.value)}
           required
@@ -48,7 +48,7 @@ export default function Login() {
           <input
             type={showPassword ? "text" : "password"}
             placeholder="Password"
-            className="w-full px-4 py-2 bg-white/70 border border-gray-300 rounded-lg placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-300 pr-12"
+            className="w-full px-4 py-3 bg-white/70 border border-gray-300 rounded-lg placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-colors duration-300 pr-12"
             value={password}
             onChange={e => setPassword(e.target.value)}
             required
@@ -75,7 +75,7 @@ export default function Login() {
         {error && <p className="text-red-700 text-sm mb-2 text-center bg-red-100 p-2 rounded-lg">{error}</p>}
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white px-4 py-3 rounded-full font-bold hover:bg-blue-700 transition duration-300 ease-in-out shadow-lg"
+          className="w-full bg-emerald-600 text-white px-4 py-3 rounded-full font-bold hover:bg-emerald-700 transition duration-300 ease-in-out shadow-lg"
           disabled={isSubmitting}
         >
           {isSubmitting ? 'Logging in...' : 'Login'}

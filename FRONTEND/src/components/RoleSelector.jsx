@@ -1,4 +1,4 @@
-export default function RoleSelector({ role, onChange }) {
+export default function RoleSelector({ role, onChange, includeAdmin = false }) {
     return (
         <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
@@ -8,8 +8,8 @@ export default function RoleSelector({ role, onChange }) {
                 onChange={e => onChange(e.target.value)}
             >
                 <option value="user">User</option>
-                <option value="owner">Owner</option>
-                <option value="admin">Admin</option>
+                <option value="owner">Store Owner</option>
+                {includeAdmin && <option value="admin">Admin</option>}
             </select>
         </div>
     );

@@ -62,7 +62,7 @@ export function AuthProvider({ children }) {
     const logout = useCallback(async () => {
         await logoutApi();
         setUser(null);
-        navigate('/login');
+        navigate('/');
     }, [navigate]);
 
     const updateProfile = useCallback(async (profileData) => {

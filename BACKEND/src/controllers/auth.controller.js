@@ -19,7 +19,8 @@ async function registerUser(req, res) {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const userRole = role && ["Admin", "Normal User", "Owner"].includes(role) ? role : "Normal User";
+    // Removed Admin from allowed roles in public registration
+    const userRole = role && ["Normal User", "Owner"].includes(role) ? role : "Normal User";
 
     const [result] = await DB.query(
       "INSERT INTO users (fullName, email, password, address, role) VALUES (?, ?, ?, ?, ?)",

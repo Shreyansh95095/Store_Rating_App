@@ -20,11 +20,12 @@ export default function Register() {
     setIsSubmitting(true);
     try {
       const user = await registerApi(form);
-      if (user.role === "Admin") window.location.assign("/admin");
-      else if (user.role === "Owner") window.location.assign("/store-owner");
+      if (user.role === "Owner") window.location.assign("/store-owner");
       else window.location.assign("/user");
     } catch (err) {
       setError(err.message);
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
@@ -35,7 +36,7 @@ export default function Register() {
         onSubmit={onSubmit}
       >
         <h2 className="text-3xl font-bold mb-6 text-gray-800 text-center">Register</h2>
-        <RoleSelector role={form.role} onChange={v => setForm({ ...form, role: v === "user" ? "Normal User" : v === "admin" ? "System Administrator" : "Store Owner" })} />
+        <RoleSelector role={form.role} onChange={v => setForm({ ...form, role: v === "user" ? "Normal User" : "Store Owner" })} />
         <input
           name="fullName"
           type="text"
