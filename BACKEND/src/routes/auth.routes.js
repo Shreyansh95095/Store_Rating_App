@@ -2,31 +2,17 @@ const express = require("express");
 const authController = require('../controllers/auth.controller');
 const { body } = require("express-validator");
 const validationResult = require("../middlewares/validate.middleware");
+const {
+  validateUserRegistration,
+  validateChangePassword,
+  validateForgotPassword,
+  validateResetPassword,
+} = require('../middlewares/validationRules.middleware');
 const { authenticateToken } = require("../middlewares/auth.middleware");
 
 const router = express.Router();
 
-const registerValidationRules = [
-  body("fullName")
-    .isLength({ min: 20, max: 60 })
-    .withMessage("Name must be between 20 and 60 characters"),
-
-  body("address")
-    .isLength({ max: 400 })
-    .withMessage("Address must be maximum 400 characters"),
-
-  body("email")
-    .isEmail()
-    .withMessage("Invalid email format"),
-
-  body("password")
-    .matches(/^(?=.*[A-Z])(?=.*[!@#$%^&*]).{8,16}$/)
-    .withMessage("Password must be 8-16 chars, include 1 uppercase and 1 special character"),
-  body("role")
-    .optional()
-    .isIn(["Admin", "Normal User", "Owner"])
-    .withMessage("Invalid role"),
-];
+const registerValidationRules = validateUserRegistration;
 
 const changePasswordValidationRules = [
   body("currentPassword")
@@ -71,19 +57,33 @@ router.get("/user/logout", authController.logoutUser);
 router.get("/me", authController.me);
 router.put("/change-password",
   authenticateToken,
-  changePasswordValidationRules,
+  validateChangePassword,
   validationResult,
   authController.changePassword
 );
 
+router.put("/profile",
+  authenticateToken,
+  [
+    body("name")
+      .isLength({ min: 20, max: 60 })
+      .withMessage("Name must be between 20 and 60 characters"),
+    body("address")
+      .isLength({ max: 400 })
+      .withMessage("Address must not exceed 400 characters"),
+  ],
+  validationResult,
+  authController.updateProfile
+);
+
 router.post("/forgot-password",
-  forgotPasswordValidationRules,
+  validateForgotPassword,
   validationResult,
   authController.forgotPassword
 );
 
 router.post("/reset-password",
-  resetPasswordValidationRules,
+  validateResetPassword,
   validationResult,
   authController.resetPassword
 );

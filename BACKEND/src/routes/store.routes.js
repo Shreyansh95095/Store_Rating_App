@@ -1,5 +1,5 @@
 const express = require("express");
-const { body } = require("express-validator");
+const { body, validationResult } = require("express-validator");
 const {
     getStoreProfile,
     createOrUpdateStoreProfile,
@@ -10,68 +10,8 @@ const { authenticateToken, authorizeRoles } = require("../middlewares/auth.middl
 
 const router = express.Router();
 
-// Validation middleware for store profile
-const storeValidation = [
-    body("storeName")
-        .notEmpty()
-        .withMessage("Store name is required")
-        .isLength({ min: 1, max: 100 })
-        .withMessage("Store name must be between 1 and 100 characters"),
-
-    body("ownerName")
-        .notEmpty()
-        .withMessage("Owner name is required")
-        .isLength({ min: 1, max: 100 })
-        .withMessage("Owner name must be between 1 and 100 characters"),
-
-    body("email")
-        .isEmail()
-        .withMessage("Please provide a valid email address")
-        .normalizeEmail(),
-
-    body("phone")
-        .notEmpty()
-        .withMessage("Phone number is required")
-        .isLength({ min: 5, max: 20 })
-        .withMessage("Phone number must be between 5 and 20 characters"),
-
-    body("address")
-        .notEmpty()
-        .withMessage("Address is required")
-        .isLength({ min: 5, max: 500 })
-        .withMessage("Address must be between 5 and 500 characters"),
-
-    body("description")
-        .optional()
-        .isLength({ max: 1000 })
-        .withMessage("Description must not exceed 1000 characters"),
-
-    body("establishedYear")
-        .optional()
-        .custom((value) => {
-            if (value === "" || value === null || value === undefined) {
-                return true; // Allow empty values
-            }
-            const year = parseInt(value);
-            if (isNaN(year) || year < 1900 || year > new Date().getFullYear()) {
-                throw new Error("Please provide a valid establishment year between 1900 and current year");
-            }
-            return true;
-        }),
-
-    body("website")
-        .optional()
-        .custom((value) => {
-            if (value === "" || value === null || value === undefined) {
-                return true; // Allow empty values
-            }
-            // More lenient URL validation
-            if (value.length > 0 && !value.includes('.')) {
-                throw new Error("Please provide a valid website URL");
-            }
-            return true;
-        })
-];
+// Use centralized validation rules
+const { validateStoreProfile: storeValidation } = require('../middlewares/validationRules.middleware');
 
 // Test endpoint for debugging (remove in production)
 router.post("/test-validation", storeValidation, (req, res) => {
@@ -94,5 +34,11 @@ router.delete("/profile", authenticateToken, authorizeRoles("Owner"), deleteStor
 
 // Admin routes
 router.get("/all", authenticateToken, authorizeRoles("Admin"), getAllStores);
+
+// Public routes (for users to browse stores)
+router.get("/public", getAllStores);
+
+// Authenticated public route (for users to browse stores with their ratings)
+router.get("/public/authenticated", authenticateToken, getAllStores);
 
 module.exports = router;

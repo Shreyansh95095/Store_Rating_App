@@ -74,7 +74,7 @@ async function loginUser(req, res) {
 
     const isPasswordCorrect = await bcrypt.compare(password, user[0].password);
     if (!isPasswordCorrect) {
-      return res.status(400).json({ message: "Invalid Password" });
+      return res.status(400).json({ message: "Invalid email or Password" });
     }
 
     const token = jwt.sign({ id: user[0].id }, process.env.JWT_SECRET);
@@ -307,6 +307,31 @@ async function resetPassword(req, res) {
 }
 
 
+// Update user profile function
+async function updateProfile(req, res) {
+  try {
+    const userId = req.user.id;
+    const { name, address } = req.body;
+
+    // Update user profile in database
+    await DB.query(
+      "UPDATE users SET fullName = ?, address = ? WHERE id = ?",
+      [name, address, userId]
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Profile updated successfully"
+    });
+  } catch (error) {
+    console.error("Error updating profile:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error"
+    });
+  }
+}
+
 module.exports = {
   registerUser,
   loginUser,
@@ -315,4 +340,5 @@ module.exports = {
   changePassword,
   forgotPassword,
   resetPassword,
+  updateProfile,
 };
