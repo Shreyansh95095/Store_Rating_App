@@ -49,7 +49,7 @@ async function handleGetAllUsersBySortingAndFiltering (req, res) {
                 u.email,
                 u.address,
                 u.role,
-                u.createdAt AS created_at,
+                u.user_created AS created_at,
                 CASE
                     WHEN u.role = 'Owner' THEN ROUND(AVG(r.rating), 2)
                     ELSE NULL
@@ -72,13 +72,13 @@ async function handleGetAllUsersBySortingAndFiltering (req, res) {
         }
         if (where.length) query += ' WHERE ' + where.join(' AND ');
 
-        query += ' GROUP BY u.id, u.fullName, u.email, u.address, u.role, u.createdAt';
+        query += ' GROUP BY u.id, u.fullName, u.email, u.address, u.role, u.user_created';
 
         const validSort = ['fullName', 'email', 'address', 'role', 'created_at', 'average_rating'];
         const validOrder = ['asc', 'desc'];
         const sortField = validSort.includes(sortBy) ? sortBy : 'fullName';
         const order = validOrder.includes((sortOrder || '').toLowerCase()) ? sortOrder.toUpperCase() : 'ASC';
-        const sortColumn = sortField === 'fullName' ? 'u.fullName' : sortField === 'created_at' ? 'u.createdAt' : sortField;
+        const sortColumn = sortField === 'fullName' ? 'u.fullName' : sortField === 'created_at' ? 'u.user_created' : sortField;
         query += ` ORDER BY ${sortColumn} ${order}`;
 
         try {
@@ -240,13 +240,13 @@ async function handleGetUserDetail (req, res) {
     try {
         const { id } = req.params;
         const [rows] = await DB.query(`
-      SELECT u.id, u.fullName AS name, u.email, u.address, u.role, u.createdAt AS created_at,
+      SELECT u.id, u.fullName AS name, u.email, u.address, u.role, u.user_created AS created_at,
         CASE WHEN u.role = 'Owner' THEN ROUND(AVG(r.rating), 2) ELSE NULL END AS average_rating
       FROM users u
       LEFT JOIN stores s ON s.ownerId = u.id
       LEFT JOIN ratings r ON r.store_id = s.id
       WHERE u.id = ?
-      GROUP BY u.id, u.fullName, u.email, u.address, u.role, u.createdAt
+      GROUP BY u.id, u.fullName, u.email, u.address, u.role, u.user_created
     `, [id]);
 
         if (!rows.length) return res.status(404).json({ error: 'User not found' });

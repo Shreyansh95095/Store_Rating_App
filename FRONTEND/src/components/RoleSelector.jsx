@@ -4,7 +4,7 @@ export default function RoleSelector({ role, onChange, includeAdmin = false }) {
             <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
             <select
                 className="w-full border rounded px-3 py-2"
-                value={role}
+                value={role.toLowerCase()}
                 onChange={e => onChange(e.target.value)}
             >
                 <option value="user">User</option>

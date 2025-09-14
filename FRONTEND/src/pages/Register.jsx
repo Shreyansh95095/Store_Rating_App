@@ -4,7 +4,7 @@ import { registerApi } from "../services/auth.js";
 import { useNavigate } from "react-router-dom";
 
 export default function Register() {
-  const [form, setForm] = useState({ fullName: "", email: "", address: "", password: "", role: "User" });
+  const [form, setForm] = useState({ fullName: "", email: "", address: "", password: "", role: "user" });
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -36,7 +36,7 @@ export default function Register() {
         onSubmit={onSubmit}
       >
         <h2 className="text-3xl font-bold mb-6 text-gray-800 text-center">Register</h2>
-        <RoleSelector role={form.role} onChange={v => setForm({ ...form, role: v === "user" ? "Normal User" : "Store Owner" })} />
+        <RoleSelector role={form.role} onChange={v => setForm({ ...form, role: v === "user" ? "User" : "Owner" })} />
         <input
           name="fullName"
           type="text"
