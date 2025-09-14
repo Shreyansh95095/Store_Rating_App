@@ -384,7 +384,7 @@ const AdminStores = () => {
 
       {/* Add Store Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-40">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-transparent backdrop-blur-sm">
           <div className="relative w-full max-w-md p-8 mx-2 bg-white border rounded-lg shadow-xl">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-bold text-gray-900">Add New Store</h3>
@@ -476,7 +476,7 @@ const AdminStores = () => {
               </div>
               {/* Actions */}
               <div className="flex gap-2 pt-4">
-                <button type="submit" className={btnPrimary + " flex-1"}>
+                <button type="submit" className={" flex-1 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-md px-4 py-2 focus:outline-none focus:ring focus:ring-blue-300 transition"}>
                   Create Store
                 </button>
                 <button

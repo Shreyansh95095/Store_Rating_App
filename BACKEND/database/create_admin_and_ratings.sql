@@ -23,3 +23,14 @@ CREATE TABLE IF NOT EXISTS ratings (
 CREATE INDEX IF NOT EXISTS idx_ratings_store ON ratings(store_id);
 CREATE INDEX IF NOT EXISTS idx_ratings_user ON ratings(user_id);
 
+
+
+-- Insert default admin user (password: Admin@1234)
+INSERT INTO users (name, email, password_hash, address, role) 
+VALUES (
+    'System Administrator',
+    'admin@example.com',
+    '$2b$10$KZx2tmSArvdmQfeGDJ1qMOxpvzlKro1OujG8B5a/1W6eiaJHTtWNW',
+    'Admin Street, Admin City, AC 12345',
+    'admin'
+) ON DUPLICATE KEY UPDATE id=id; 

@@ -9,6 +9,7 @@ import {
   Activity
 } from 'lucide-react';
 import LoadingSpinner from '../../components/LoadingSpinner';
+import { Link } from 'react-router-dom';
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState(null);
@@ -95,8 +96,8 @@ const AdminDashboard = () => {
       <div className="bg-white rounded-lg shadow-sm p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <a
-            href="/admin/users"
+          <Link 
+            to="/admin/users" 
             className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200"
           >
             <div className="p-2 rounded-lg bg-blue-500">
@@ -106,9 +107,9 @@ const AdminDashboard = () => {
               <p className="text-sm font-medium text-gray-900">Manage Users</p>
               <p className="text-xs text-gray-500">View and manage all users</p>
             </div>
-          </a>
-          <a
-            href="/admin/stores"
+          </Link>
+          <Link 
+            to="/admin/stores"
             className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200"
           >
             <div className="p-2 rounded-lg bg-green-500">
@@ -118,7 +119,7 @@ const AdminDashboard = () => {
               <p className="text-sm font-medium text-gray-900">Manage Stores</p>
               <p className="text-xs text-gray-500">Add and manage stores</p>
             </div>
-          </a>
+          </Link>
         </div>
       </div>
 
